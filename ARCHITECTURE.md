@@ -1,7 +1,7 @@
-# Bazaedam App Architecture
+# Porokh App Architecture
 
 ## Overview
-This document outlines the complete production architecture for the Bazaedam application.
+This document outlines the complete production architecture for the Porokh application.
 
 ## Architecture Diagram
 ```
@@ -18,20 +18,20 @@ This document outlines the complete production architecture for the Bazaedam app
 
 ## Core Components
 
-### 1. Flutter Frontend (e:/bazaedam/bazaedam_app)
+### 1. Flutter Frontend (e:/porokh/porokh_app)
 - **State Management**: Riverpod
 - **Data Loading**: Dynamic loading of divisions, categories, products from Supabase
 - **Authentication**: Supabase Auth integration
 - **Real-time Updates**: Supabase Realtime for live data sync
 - **File Storage**: Supabase Storage for images and documents
 
-### 2. Supabase Backend (e:/bazaedam/supabase_schema.sql)
+### 2. Supabase Backend (e:/porokh/supabase_schema.sql)
 - **Database Schema**: divisions, categories, products, ai_results tables
 - **Row Level Security (RLS)**: Enforced for all tables
 - **Storage Buckets**: For product images, documents, AI-generated content
 - **Authentication**: Supabase Auth for user management
 
-### 3. Python AI Services (e:/bazaedam/ai_service)
+### 3. Python AI Services (e:/porokh/ai_service)
 - **Framework**: FastAPI
 - **AI Models**: Pre-trained models for recommendations and analysis
 - **API Endpoints**: 

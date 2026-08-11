@@ -1,4 +1,4 @@
-"""Tests for the Bazardam price service.
+"""Tests for the Porokh price service.
 
 These exercise the analysis logic directly (no network) plus the HTTP surface
 via FastAPI's TestClient. Run with:  pytest ai_service/test_main.py -v

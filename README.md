@@ -1,11 +1,11 @@
-# Bazardam · বাজারদাম
+# Porokh · পরখ
 
 Compare product prices across sellers in Bangladesh. Search in **Bangla or
 English**, see what every shop charges, and know **when each price was last
 checked**.
 
 ```
-USER OPENS BAZARDAM  →  SEARCHES ("চাল" or "rice")  →  SEES EVERY SELLER'S PRICE
+USER OPENS POROKH  →  SEARCHES ("চাল" or "rice")  →  SEES EVERY SELLER'S PRICE
                      →  CHEAPEST IS BADGED  →  KNOWS HOW FRESH EACH PRICE IS
 ```
 
@@ -30,8 +30,8 @@ screen, and the same logic serves the app and the Python service.
 ## Layout
 
 ```
-bazaedam/
-├── bazaedam_app/                Flutter app
+porokh/
+├── porokh_app/                Flutter app
 │   ├── lib/
 │   │   ├── core/formatters.dart     ৳ BDT, Bangla digits, freshness
 │   │   ├── l10n/app_strings.dart    Bangla + English
@@ -54,7 +54,7 @@ bazaedam/
 │
 ├── supabase_schema.sql          original schema (migration 001)
 ├── HOW_TO_RUN.md                start here
-├── BAZARDAM_AUDIT.md            audit of the pre-rebuild codebase
+├── POROKH_AUDIT.md            audit of the pre-rebuild codebase
 └── docs/archive/                superseded planning docs
 ```
 
@@ -67,7 +67,7 @@ bazaedam/
 # 2. Make yourself admin:
 #    UPDATE public.profiles SET role='admin' WHERE email='you@example.com';
 
-cd bazaedam_app && flutter pub get && flutter run
+cd porokh_app && flutter pub get && flutter run
 ```
 
 Full instructions, including how to add sellers and prices: **[HOW_TO_RUN.md](HOW_TO_RUN.md)**
@@ -104,7 +104,7 @@ timestamp the app surfaces so a price is never presented as current when it isn'
 ## Tests
 
 ```bash
-cd bazaedam_app && flutter test          # formatters, models, widgets
+cd porokh_app && flutter test          # formatters, models, widgets
 cd ai_service && pytest -v               # 23 tests
 python database/tests/test_migration.py  # 62 checks on real PostgreSQL
 ```

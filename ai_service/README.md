@@ -1,6 +1,6 @@
-# Bazaedam AI Service
+# Porokh AI Service
 
-AI service for product recommendations and analysis in the Bazaedam application.
+AI service for product recommendations and analysis in the Porokh application.
 
 ## Features
 - Product analysis and insights
@@ -34,10 +34,10 @@ python main.py
 ### Using Docker
 ```bash
 # Build the Docker image
-docker build -t bazaedam-ai-service .
+docker build -t porokh-ai-service .
 
 # Run the container
-docker run -p 8000:8000 bazaedam-ai-service
+docker run -p 8000:8000 porokh-ai-service
 ```
 
 ## API Endpoints

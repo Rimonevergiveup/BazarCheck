@@ -2,12 +2,12 @@
 node_modules/
 
 # Flutter
-bazaedam_app/.dart_tool/
-bazaedam_app/.packages
-bazaedam_app/.pub-cache/
-bazaedam_app/.pub/
-bazaedam_app/build/
-bazaedam_app/packages/
+porokh_app/.dart_tool/
+porokh_app/.packages
+porokh_app/.pub-cache/
+porokh_app/.pub/
+porokh_app/build/
+porokh_app/packages/
 
 # Python
 ai_service/__pycache__/
@@ -64,10 +64,10 @@ supabase/
 Thumbs.db
 
 # Flutter build artifacts
-bazaedam_app/android/app/build/
-bazaedam_app/ios/Pods/
-bazaedam_app/macos/Flutter/ephemeral/
-bazaedam_app/windows/flutter/ephemeral/
+porokh_app/android/app/build/
+porokh_app/ios/Pods/
+porokh_app/macos/Flutter/ephemeral/
+porokh_app/windows/flutter/ephemeral/
 
 # Python build artifacts
 ai_service/__pycache__/
@@ -76,6 +76,6 @@ ai_service/*.pyo
 ai_service/*.pyd
 
 # Generated files
-bazaedam_app/lib/*.g.dart
-bazaedam_app/lib/*.freezed.dart
-bazaedam_app/lib/*.gr.dart
+porokh_app/lib/*.g.dart
+porokh_app/lib/*.freezed.dart
+porokh_app/lib/*.gr.dart

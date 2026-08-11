@@ -1,18 +1,25 @@
 {
-  "name": "bazaedam-app",
+  "name": "porokh",
   "version": "1.0.0",
-  "description": "Bazaedam App - Flutter + Supabase + Python AI",
-  "main": "index.js",
+  "private": true,
+  "description": "Porokh — compare product prices across sellers in Bangladesh. Flutter + Supabase + Python price service.",
   "scripts": {
-    "setup": "echo 'Setting up Bazaedam App' && cd bazaedam_app && flutter pub get && cd .. && cd ai_service && pip install -r requirements.txt && cd ..",
-    "start:flutter": "cd bazaedam_app && flutter run",
-    "start:ai": "cd ai_service && python main.py",
-    "build:flutter": "cd bazaedam_app && flutter build apk",
-    "build:ai": "cd ai_service && docker build -t bazaedam-ai-service ."
+    "setup": "cd porokh_app && flutter pub get && cd ../ai_service && pip install -r requirements.txt",
+    "app": "cd porokh_app && flutter run",
+    "app:build": "cd porokh_app && flutter build apk --release",
+    "service": "cd ai_service && python main.py",
+    "service:build": "docker compose build",
+    "test": "npm run test:app && npm run test:service && npm run test:db",
+    "test:app": "cd porokh_app && flutter analyze --fatal-warnings && flutter test",
+    "test:service": "cd ai_service && pytest -v",
+    "test:db": "python database/tests/test_migration.py"
   },
-  "keywords": ["flutter", "supabase", "python", "ai", "recommendation"],
-  "author": "Bazaedam Team",
-  "license": "MIT",
-  "dependencies": {},
-  "devDependencies": {}
+  "keywords": [
+    "porokh",
+    "price-comparison",
+    "bangladesh",
+    "flutter",
+    "supabase"
+  ],
+  "license": "MIT"
 }

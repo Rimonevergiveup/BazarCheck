@@ -1,4 +1,4 @@
-"""Verify Bazardam migration 002 against a real PostgreSQL instance.
+"""Verify Porokh migration 002 against a real PostgreSQL instance.
 
 Simulates Supabase (auth schema + auth.uid()/auth.role()), applies the ORIGINAL
 schema with sample data, then applies migration 002 and checks backfill,
@@ -24,7 +24,7 @@ if DATABASE_URL:
 else:
     import pgserver  # noqa: PLC0415  - optional local-only dependency
 
-    PGDATA = pathlib.Path("/tmp/bazardam_pgtest")
+    PGDATA = pathlib.Path("/tmp/porokh_pgtest")
     if PGDATA.exists():
         shutil.rmtree(PGDATA, ignore_errors=True)
     PGDATA.mkdir(parents=True, exist_ok=True)
@@ -128,7 +128,7 @@ check("original products seeded", "COUNT(*) FROM products", 4)
 check("original divisions seeded", "COUNT(*) FROM divisions", 3)
 exec_sql(
     "INSERT INTO auth.users (id, email) VALUES "
-    "('11111111-1111-1111-1111-111111111111', 'owner@bazardam.test')",
+    "('11111111-1111-1111-1111-111111111111', 'owner@porokh.test')",
     "seed user",
 )
 
@@ -189,7 +189,7 @@ check("unique(product,seller)", "COUNT(*) FROM pg_constraint "
                                 "WHERE conname='prices_unique_product_seller'", 1)
 
 print("\n[5] Backfill (must not lose data)")
-check("placeholder seller", "COUNT(*) FROM sellers WHERE slug='bazardam-listing'", 1)
+check("placeholder seller", "COUNT(*) FROM sellers WHERE slug='porokh-listing'", 1)
 check("4 prices backfilled", "COUNT(*) FROM prices", 4)
 check("products.price NOT dropped", "COUNT(*) FROM information_schema.columns "
                                     "WHERE table_name='products' AND column_name='price'", 1)
@@ -207,7 +207,7 @@ check("no duplicate sellers", "COUNT(*) FROM sellers", 1)
 check("no duplicate profiles", "COUNT(*) FROM profiles", 1)
 
 print("\n[7] Constraints")
-sid = scalar("SELECT id FROM sellers WHERE slug='bazardam-listing'")
+sid = scalar("SELECT id FROM sellers WHERE slug='porokh-listing'")
 pid = scalar("SELECT id FROM products WHERE name='iPhone 15 Pro'")
 check_raises("negative price",
              f"INSERT INTO prices (product_id,seller_id,price) VALUES ('{pid}','{sid}',-5)")

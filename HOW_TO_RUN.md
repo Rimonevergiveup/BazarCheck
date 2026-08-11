@@ -1,4 +1,4 @@
-# Bazardam — How to Run
+# Porokh — How to Run
 
 A price-comparison app for Bangladesh. Search a product in **Bangla or English**,
 see what every seller charges, and know **when each price was last checked**.
@@ -26,7 +26,7 @@ drops no columns, deletes no rows, and is safe to run twice. It will:
 - add `sellers`, `prices`, `price_history`, `favorites`, `profiles`
 - add `name_bn`, `brand`, `unit`, `search_text` to `products`
 - **move your existing `products.price` values into `prices`**, attached to a
-  placeholder seller called *Bazardam Listing* (`products.price` is left intact)
+  placeholder seller called *Porokh Listing* (`products.price` is left intact)
 - close the security hole where any signed-up user could rewrite every price
 
 ### Make yourself an admin
@@ -38,7 +38,7 @@ UPDATE public.profiles SET role = 'admin' WHERE email = 'you@example.com';
 ```
 
 Until you do this, nobody can add or change prices from the app — which is the
-point. Re-assign the backfilled prices from *Bazardam Listing* to real sellers as
+point. Re-assign the backfilled prices from *Porokh Listing* to real sellers as
 you add them.
 
 ---
@@ -46,7 +46,7 @@ you add them.
 ## 2. Run the Flutter app
 
 ```bash
-cd bazaedam_app
+cd porokh_app
 flutter pub get
 flutter run
 ```
@@ -95,7 +95,7 @@ flutter run --dart-define=PRICE_SERVICE_URL=http://192.168.1.10:8000
 
 ```bash
 # Flutter — formatters, models, widgets
-cd bazaedam_app && flutter test
+cd porokh_app && flutter test
 
 # Price service — analysis logic + HTTP surface
 cd ai_service && pytest -v

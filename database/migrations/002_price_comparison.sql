@@ -1,5 +1,5 @@
 -- ============================================================================
--- Bazardam — Migration 002: Price Comparison Core
+-- Porokh — Migration 002: Price Comparison Core
 -- ============================================================================
 -- ADDITIVE AND IDEMPOTENT. Safe to run on a database that already has real
 -- data. Nothing is dropped, nothing is deleted. Safe to run more than once.
@@ -272,13 +272,13 @@ CREATE TRIGGER set_timestamp_prices BEFORE UPDATE ON public.prices
 -- you add real data. products.price is LEFT IN PLACE (deprecated, not dropped).
 
 INSERT INTO public.sellers (name, name_bn, slug, seller_type, location, city)
-VALUES ('Bazardam Listing', 'বাজারদাম তালিকা', 'bazardam-listing', 'retail', 'Unassigned', 'Dhaka')
+VALUES ('Porokh Listing', 'পরখ তালিকা', 'porokh-listing', 'retail', 'Unassigned', 'Dhaka')
 ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO public.prices (product_id, seller_id, price, currency, source, collected_at)
 SELECT
   p.id,
-  (SELECT id FROM public.sellers WHERE slug = 'bazardam-listing'),
+  (SELECT id FROM public.sellers WHERE slug = 'porokh-listing'),
   p.price,
   'BDT',
   'import',
