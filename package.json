@@ -1,0 +1,18 @@
+{
+  "name": "bazaedam-app",
+  "version": "1.0.0",
+  "description": "Bazaedam App - Flutter + Supabase + Python AI",
+  "main": "index.js",
+  "scripts": {
+    "setup": "echo 'Setting up Bazaedam App' && cd bazaedam_app && flutter pub get && cd .. && cd ai_service && pip install -r requirements.txt && cd ..",
+    "start:flutter": "cd bazaedam_app && flutter run",
+    "start:ai": "cd ai_service && python main.py",
+    "build:flutter": "cd bazaedam_app && flutter build apk",
+    "build:ai": "cd ai_service && docker build -t bazaedam-ai-service ."
+  },
+  "keywords": ["flutter", "supabase", "python", "ai", "recommendation"],
+  "author": "Bazaedam Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -1,0 +1,11 @@
+ this app i make it proper Arthitecter 
+ in this App i want to use Flutter and the backend use first Api and also the Supabase for database or data store now give me proper architecture
+My honest recommendation
+
+Do not hardcode divisions, products, or categories in Flutter.
+
+Everything should come from the database.
+
+That will make your app truly scalable. give me in bangla
+dart language use and for Ai use python 
+Give me Flutter + Supabase + Python AI-এর complete production architecture

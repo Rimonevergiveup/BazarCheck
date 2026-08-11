@@ -1,0 +1,94 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+lib/
+lib64/
+bin/
+include/
+.pytest_cache/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Build artifacts
+out/
+dist/
+build/
+
+# Docker
+.dockerignore
+
+# Models
+models/
+
+# Data
+data/
+
+# FastAPI
+uvicorn.pid
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+.env/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+
+# Mypy
+.mypy_cache/
+
+# Black
+.black
+
+# Ruff
+.ruff_cache/
+
+# Poetry
+poetry.lock
+
+# Pipenv
+Pipfile.lock
+
+# Conda
+environment.yml
+
+# Docker
+.dockerignore
+
+# Supabase
+supabase/
+.supabase/
+
+# Flutter
+bazaedam_app/

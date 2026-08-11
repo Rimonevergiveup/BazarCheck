@@ -1,0 +1,81 @@
+# Project root
+node_modules/
+
+# Flutter
+bazaedam_app/.dart_tool/
+bazaedam_app/.packages
+bazaedam_app/.pub-cache/
+bazaedam_app/.pub/
+bazaedam_app/build/
+bazaedam_app/packages/
+
+# Python
+ai_service/__pycache__/
+ai_service/*.pyc
+ai_service/*.pyo
+ai_service/*.pyd
+ai_service/.Python
+ai_service/env/
+ai_service/venv/
+ai_service/.venv/
+ai_service/lib/
+ai_service/lib64/
+ai_service/bin/
+ai_service/include/
+ai_service/.pytest_cache/
+ai_service/.coverage
+ai_service/.coverage.*
+ai_service/.cache
+ai_service/nosetests.xml
+ai_service/coverage.xml
+ai_service/*.cover
+ai_service/*.log
+ai_service/.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Build artifacts
+out/
+dist/
+build/
+
+# Docker
+.dockerignore
+
+# Supabase
+supabase/
+.supabase/
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Flutter build artifacts
+bazaedam_app/android/app/build/
+bazaedam_app/ios/Pods/
+bazaedam_app/macos/Flutter/ephemeral/
+bazaedam_app/windows/flutter/ephemeral/
+
+# Python build artifacts
+ai_service/__pycache__/
+ai_service/*.pyc
+ai_service/*.pyo
+ai_service/*.pyd
+
+# Generated files
+bazaedam_app/lib/*.g.dart
+bazaedam_app/lib/*.freezed.dart
+bazaedam_app/lib/*.gr.dart
