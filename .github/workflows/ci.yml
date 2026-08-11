@@ -8,7 +8,7 @@ on:
 
 jobs:
   flutter:
-    name: Flutter Analyze & Test
+    name: Flutter analyze & test
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -19,11 +19,13 @@ jobs:
         with:
           channel: stable
       - run: flutter pub get
-      - run: flutter analyze
+      # Warnings fail the build. Without this the job stays green while lint
+      # debt accumulates.
+      - run: flutter analyze --fatal-infos --fatal-warnings
       - run: flutter test
 
   python:
-    name: Python Lint & Check
+    name: Price service tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,4 +36,42 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt
-      - run: python -c "import main; print('Python module loads OK')"
+      # Runs with no Supabase credentials on purpose: the service must start
+      # and report unconfigured rather than crash or invent data.
+      - run: pytest -v
+
+  database:
+    name: Migration test (real PostgreSQL)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: bazardam_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install "psycopg[binary]"
+      # Applies the original schema, then migration 002, then asserts the
+      # backfill, constraints, RLS and all four RPC functions behave.
+      - run: python database/tests/test_migration.py
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/bazardam_test
+
+  docker:
+    name: Price service image builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Guards the Dockerfile regression: it previously used Alpine/BusyBox
+      # adduser flags on a Debian base, so the build failed outright.
+      - run: docker build -t bazardam-price-service ./ai_service

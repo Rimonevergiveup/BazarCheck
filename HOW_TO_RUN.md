@@ -1,84 +1,162 @@
-# Bazaedam — How to Run
+# Bazardam — How to Run
 
-A Flutter marketplace app: **Divisions → Categories → Products**, loaded dynamically
-from Supabase (nothing hardcoded), with email auth and AI product analysis +
-recommendations served by the Python FastAPI service.
+A price-comparison app for Bangladesh. Search a product in **Bangla or English**,
+see what every seller charges, and know **when each price was last checked**.
 
-Your Supabase credentials are already wired into the app
-(`bazaedam_app/lib/config/app_config.dart`), so once the database schema is applied
-the app runs with no further config.
+```
+Flutter app  ──►  Supabase (PostgreSQL + Auth)   ← all comparison happens here
+     │                    ▲
+     └──►  Python price service (optional)  ──────┘   trends & statistics
+```
 
 ---
 
-## 1. Apply the database schema (required — do this first)
+## 1. Apply the database migration — do this first
 
-The app reads from tables that must exist in your Supabase project.
+The app reads through RPC functions that migration 002 creates. Nothing works
+until it has run.
 
-1. Open your project → **SQL Editor**: https://supabase.com/dashboard/project/wgzzqssnkucrfzdxtqra/sql
-2. Paste the entire contents of **`supabase_schema.sql`** and click **Run**.
+1. Open **Supabase → SQL Editor → New query**
+2. Paste the whole of **`database/migrations/002_price_comparison.sql`**
+3. Run it
 
-This creates `divisions`, `categories`, `products`, `ai_results`, enables Row Level
-Security (public read), and inserts sample data (Electronics, Clothing, Home & Kitchen…).
+The migration is **additive and idempotent**: it creates nothing destructively,
+drops no columns, deletes no rows, and is safe to run twice. It will:
 
-## 2. Allow quick sign-in (recommended for testing)
+- add `sellers`, `prices`, `price_history`, `favorites`, `profiles`
+- add `name_bn`, `brand`, `unit`, `search_text` to `products`
+- **move your existing `products.price` values into `prices`**, attached to a
+  placeholder seller called *Bazardam Listing* (`products.price` is left intact)
+- close the security hole where any signed-up user could rewrite every price
 
-By default Supabase requires email confirmation before a new account can log in.
-For fast local testing: **Authentication → Providers → Email → turn OFF "Confirm email"**,
-then Save. (Leave it ON for production and confirm via the email link instead.)
+### Make yourself an admin
 
-## 3. Run the Flutter app
+Writes are now admin-only. Grant yourself the role from the SQL Editor:
+
+```sql
+UPDATE public.profiles SET role = 'admin' WHERE email = 'you@example.com';
+```
+
+Until you do this, nobody can add or change prices from the app — which is the
+point. Re-assign the backfilled prices from *Bazardam Listing* to real sellers as
+you add them.
+
+---
+
+## 2. Run the Flutter app
 
 ```bash
 cd bazaedam_app
 flutter pub get
-flutter run          # pick a device / emulator / Chrome
+flutter run
 ```
 
-Sign up, then sign in. You'll land on the **Divisions** list → tap to drill into
-**Categories** → tap into **Products** → tap a product for details.
+**No login is required.** Search, browse and compare prices work anonymously.
+An account is only needed to save favourites.
 
-## 4. Start the Python AI service (for AI Analysis + Recommendations)
-
-The product detail screen and the ✨ recommendations button call this service.
-The app auto-targets it correctly on the Android emulator (`10.0.2.2:8000`) and on
-iOS/desktop/web (`localhost:8000`).
+To point at a different Supabase project without editing source:
 
 ```bash
-cd ai_service
-pip install -r requirements.txt
-python main.py        # serves http://localhost:8000
-```
-
-If the service is off, the app still works — the AI sections just show an
-"AI service is offline" message with a Retry button.
-
-**Physical phone?** It can't reach your PC's localhost. Run the app pointing at your
-computer's LAN IP:
-
-```bash
-flutter run --dart-define=AI_BASE_URL=http://192.168.1.10:8000   # your PC's IP
+flutter run \
+  --dart-define=SUPABASE_URL=https://xxx.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=sb_publishable_xxx
 ```
 
 ---
 
-## What was fixed to make it work
+## 3. Run the price service (optional)
 
-- The whole Flutter `lib/` UI/data layer existed as a skeleton, but **Supabase
-  credentials were placeholders** (`your-project-url…`) — the app could never connect.
-  Real URL + publishable key are now baked in via `AppConfig`.
-- **AI was never wired to the app.** Added a typed `AiService`, `ProductAnalysis` /
-  `Recommendation` models, Riverpod providers, a product **AI Analysis** section with
-  thumbs-up/down feedback, and a **Recommendations** screen.
-- Replaced the flat "dump everything" home screen with a proper
-  **Division → Category → Product** drill-down, with loading / empty / error states
-  and pull-to-refresh.
+The app is fully functional without it — all comparison happens in Postgres.
+This service adds statistical analysis on top: medians, trend detection from
+price history, and stale-price flagging.
+
+```bash
+cd ai_service
+cp .env.example .env        # fill in SUPABASE_URL and SUPABASE_ANON_KEY
+pip install -r requirements.txt
+python main.py              # http://localhost:8000  (docs at /docs)
+```
+
+Or with Docker:
+
+```bash
+docker compose up --build
+```
+
+Physical device? It cannot reach your PC's `localhost`:
+
+```bash
+flutter run --dart-define=PRICE_SERVICE_URL=http://192.168.1.10:8000
+```
+
+---
+
+## 4. Run the tests
+
+```bash
+# Flutter — formatters, models, widgets
+cd bazaedam_app && flutter test
+
+# Price service — analysis logic + HTTP surface
+cd ai_service && pytest -v
+
+# Database — applies both schemas to a real PostgreSQL and asserts
+# backfill, constraints, RLS and all four RPC functions
+pip install "psycopg[binary]" pgserver
+python database/tests/test_migration.py
+```
+
+---
+
+## Adding real price data
+
+```sql
+-- 1. A seller
+INSERT INTO sellers (name, name_bn, slug, seller_type, city)
+VALUES ('Shwapno', 'স্বপ্ন', 'shwapno', 'retail', 'Dhaka');
+
+-- 2. A product, searchable in both scripts
+INSERT INTO products (name, name_bn, brand, unit, category_id, description)
+VALUES ('Miniket Rice', 'মিনিকেট চাল', 'ACI', 'kg',
+        (SELECT id FROM categories WHERE name = 'Rice'), 'Premium miniket');
+
+-- 3. That seller's price. collected_at is what the app shows as freshness —
+--    always set it honestly.
+INSERT INTO prices (product_id, seller_id, price, unit, source, collected_at)
+VALUES (
+  (SELECT id FROM products WHERE name = 'Miniket Rice'),
+  (SELECT id FROM sellers  WHERE slug = 'shwapno'),
+  78.00, 'kg', 'manual', NOW()
+);
+```
+
+Add the same product at a second seller and the comparison appears
+automatically — cheapest badge, savings figure, and the spread on the card.
+
+`price_history` is written by a trigger whenever a price changes. You never
+insert into it directly.
+
+---
 
 ## Troubleshooting
 
-- **Blank lists / "No divisions yet":** the schema hasn't been applied — do step 1, then pull to refresh.
-- **Login fails right after sign-up:** email confirmation is on — do step 2, or click the link in the confirmation email.
-- **Auth key / "Invalid API key" error on startup:** your resolved `supabase_flutter`
-  may predate the new `sb_publishable_…` key format. Run `flutter pub upgrade supabase_flutter`,
-  or use the legacy `anon` JWT from **Settings → API** instead of the publishable key.
-- **Product images show a broken-image icon:** expected — the sample rows use
-  `https://example.com/...` placeholder URLs. Replace `image_url` values with real ones.
+**Empty lists / "Nothing here yet"** — migration 002 has not been applied. Do step 1.
+
+**Prices show but no comparison** — each product has only one seller. Comparison
+needs two or more rows in `prices` for the same `product_id`.
+
+**"Only an admin can change a role"** — expected. Run the promotion SQL from the
+Supabase SQL Editor (service_role context), not from the app.
+
+**Cannot insert prices from the app** — also expected. Writes require
+`profiles.role = 'admin'`.
+
+**Bangla search finds nothing** — the product needs a `name_bn` value.
+`search_text` is generated from `name + name_bn + brand + description`.
+
+**Broken product images** — the original seed rows use `https://example.com/...`
+placeholders. Replace `image_url` with real URLs; the app shows a neutral basket
+icon rather than a broken-image glyph in the meantime.
+
+**Price shows "Price unavailable"** — no seller has a row in `prices` for that
+product. This is deliberate: the app will not print ৳0 when it does not know.

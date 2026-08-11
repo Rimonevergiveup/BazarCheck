@@ -1,10 +1,9 @@
-version: "3.9"
-
 services:
-  ai-service:
+  price-service:
     build:
       context: ./ai_service
       dockerfile: Dockerfile
+    image: bazardam/price-service:2.0.0
     ports:
       - "8000:8000"
     env_file:
@@ -12,9 +11,22 @@ services:
     environment:
       - API_HOST=0.0.0.0
       - API_PORT=8000
+      - API_RELOAD=false
     restart: unless-stopped
+    # Read-only root filesystem + no privilege escalation. The service writes
+    # nothing to disk, so there is no reason to allow it.
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4).status==200 else 1)"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
