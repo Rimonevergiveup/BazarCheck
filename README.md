@@ -62,12 +62,14 @@ porokh/
 
 ## Quick start
 
-```bash
-# 1. Apply database/migrations/002_price_comparison.sql in the Supabase SQL Editor
-# 2. Make yourself admin:
-#    UPDATE public.profiles SET role='admin' WHERE email='you@example.com';
+1. Apply `database/migrations/002_price_comparison.sql` in the Supabase SQL Editor
+2. Make yourself admin: `UPDATE public.profiles SET role='admin' WHERE email='you@example.com';`
+3. Run it:
 
-cd porokh_app && flutter pub get && flutter run
+```
+cd porokh_app
+flutter pub get
+flutter run
 ```
 
 Full instructions, including how to add sellers and prices: **[HOW_TO_RUN.md](HOW_TO_RUN.md)**
@@ -103,10 +105,21 @@ timestamp the app surfaces so a price is never presented as current when it isn'
 
 ## Tests
 
-```bash
-cd porokh_app && flutter test          # formatters, models, widgets
-cd ai_service && pytest -v               # 23 tests
-python database/tests/test_migration.py  # 62 checks on real PostgreSQL
+From the repo root, in any shell (these route through `cmd.exe` on Windows, so
+they work in PowerShell 5.1 too):
+
+```
+npm run test:app        # flutter analyze + flutter test
+npm run test:service    # 23 price-service tests
+npm run test:db         # 62 migration checks on real PostgreSQL
+npm test                # all three
+```
+
+Or directly — one command per line, since Windows PowerShell 5.1 rejects `&&`:
+
+```
+cd porokh_app
+flutter test
 ```
 
 CI runs all three plus `flutter analyze --fatal-warnings` and a Docker build.

@@ -93,17 +93,46 @@ flutter run --dart-define=PRICE_SERVICE_URL=http://192.168.1.10:8000
 
 ## 4. Run the tests
 
-```bash
-# Flutter — formatters, models, widgets
-cd porokh_app && flutter test
+> **Windows PowerShell users:** Windows PowerShell 5.1 (the blue default shell)
+> does not support `&&` — it errors with *"The token '&&' is not a valid
+> statement separator in this version."* Run each line separately, as written
+> below, or use the `npm run` shortcuts at the end of this section.
 
-# Price service — analysis logic + HTTP surface
-cd ai_service && pytest -v
+**Flutter — formatters, models, widgets**
 
-# Database — applies both schemas to a real PostgreSQL and asserts
-# backfill, constraints, RLS and all four RPC functions
+```
+cd porokh_app
+flutter pub get
+flutter analyze
+flutter test
+```
+
+**Price service — analysis logic + HTTP surface**
+
+```
+cd ai_service
+pip install -r requirements.txt
+pytest -v
+```
+
+**Database — applies both schemas to a real PostgreSQL, then asserts the
+backfill, constraints, RLS and all four RPC functions**
+
+```
 pip install "psycopg[binary]" pgserver
 python database/tests/test_migration.py
+```
+
+### Shortcuts
+
+`npm` runs its scripts through `cmd.exe` on Windows, where `&&` *is* valid — so
+these work in any shell, from the repo root:
+
+```
+npm run test:app        # flutter analyze + flutter test
+npm run test:service    # pytest
+npm run test:db         # migration checks
+npm test                # all three
 ```
 
 ---
