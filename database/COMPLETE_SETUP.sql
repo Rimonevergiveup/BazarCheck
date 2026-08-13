@@ -6,14 +6,16 @@
 --
 -- No CLI, no login, no database password needed.
 --
--- It contains, in order:
+-- Contains, in order:
 --   1. Base catalogue        divisions, categories, products, ai_results
 --   2. Price comparison      sellers, prices, price_history, favorites,
 --                            profiles, bilingual search, RLS, 4 RPC functions
---   3. Sample data           7 Bangladeshi sellers, 14 bilingual products,
+--   3. Favourites RPC        server-side, scoped to auth.uid()
+--   4. Sample data           7 Bangladeshi sellers, 14 bilingual products,
 --                            43 prices, 30 days of price history
 --
--- Safe to run more than once - everything is idempotent.
+-- Safe to run more than once - everything is idempotent. Re-run it after any
+-- update to pick up new migrations.
 --
 -- AFTER RUNNING: sign up in the app, then make yourself admin:
 --   UPDATE public.profiles SET role='admin' WHERE email='YOUR@EMAIL.COM';
@@ -23,7 +25,7 @@
 
 
 -- ==========================================================================
--- PART 1 of 3 — BASE CATALOGUE
+-- PART 1 of 4 — BASE CATALOGUE
 -- ==========================================================================
 
 -- ============================================================================
@@ -159,7 +161,7 @@ END $$;
 
 
 -- ==========================================================================
--- PART 2 of 3 — PRICE COMPARISON
+-- PART 2 of 4 — PRICE COMPARISON
 -- ==========================================================================
 
 -- ============================================================================
@@ -794,7 +796,94 @@ GRANT EXECUTE ON FUNCTION public.get_price_history(UUID, INT)  TO anon, authenti
 
 
 -- ==========================================================================
--- PART 3 of 3 — SAMPLE DATA
+-- PART 3 of 4 — FAVOURITES RPC
+-- ==========================================================================
+
+-- ============================================================================
+-- Porokh — Migration 003: favourites RPC
+-- ============================================================================
+-- Fixes a real scaling bug. The app previously loaded favourites by fetching
+-- the first 100 products and filtering client-side, so a favourite ranked 101st
+-- silently vanished from the list.
+--
+-- This returns the favourited products directly, with the same price summary
+-- shape as search_products, so the same ProductCard renders them.
+--
+-- Scoped by auth.uid() rather than taking a user_id argument: there is then no
+-- way to ask for somebody else's favourites, regardless of what the client
+-- sends.
+--
+-- ADDITIVE AND IDEMPOTENT.
+-- ============================================================================
+
+DROP FUNCTION IF EXISTS public.get_favorite_products(INT, INT);
+CREATE FUNCTION public.get_favorite_products(
+  p_limit  INT DEFAULT 100,
+  p_offset INT DEFAULT 0
+)
+RETURNS TABLE (
+  id            UUID,
+  name          TEXT,
+  name_bn       TEXT,
+  brand         TEXT,
+  description   TEXT,
+  image_url     TEXT,
+  unit          TEXT,
+  category_id   UUID,
+  category_name TEXT,
+  min_price     NUMERIC,
+  max_price     NUMERIC,
+  seller_count  INT,
+  last_updated  TIMESTAMPTZ,
+  total_count   BIGINT
+)
+LANGUAGE sql
+STABLE
+SECURITY INVOKER
+SET search_path = public
+AS $$
+  WITH mine AS (
+    SELECT f.product_id, f.created_at
+    FROM public.favorites f
+    WHERE f.user_id = auth.uid()
+  ),
+  summary AS (
+    SELECT
+      pr.product_id,
+      MIN(pr.price)        AS min_price,
+      MAX(pr.price)        AS max_price,
+      COUNT(*)::INT        AS seller_count,
+      MAX(pr.collected_at) AS last_updated
+    FROM public.prices pr
+    JOIN mine m ON m.product_id = pr.product_id
+    WHERE pr.in_stock
+    GROUP BY pr.product_id
+  ),
+  counted AS (SELECT COUNT(*) AS n FROM mine)
+  SELECT
+    p.id, p.name, p.name_bn, p.brand, p.description, p.image_url, p.unit,
+    p.category_id, c.name AS category_name,
+    s.min_price, s.max_price,
+    COALESCE(s.seller_count, 0) AS seller_count,
+    s.last_updated,
+    (SELECT n FROM counted) AS total_count
+  FROM mine m
+  JOIN public.products p       ON p.id = m.product_id
+  LEFT JOIN summary s          ON s.product_id = p.id
+  LEFT JOIN public.categories c ON c.id = p.category_id
+  WHERE p.is_active
+  ORDER BY m.created_at DESC          -- most recently saved first
+  LIMIT  GREATEST(1, LEAST(p_limit, 200))
+  OFFSET GREATEST(0, p_offset);
+$$;
+
+-- Authenticated only: an anonymous caller has no auth.uid() and would always
+-- get an empty set, so there is no reason to expose it to anon.
+GRANT EXECUTE ON FUNCTION public.get_favorite_products(INT, INT) TO authenticated;
+
+
+-- ==========================================================================
+-- PART 4 of 4 — SAMPLE DATA
 -- ==========================================================================
 
 -- ============================================================================
@@ -862,24 +951,24 @@ ON CONFLICT (slug) DO NOTHING;
 -- ----------------------------------------------------------------------------
 -- Products  (English + Bangla names, so search works in both scripts)
 -- ----------------------------------------------------------------------------
-INSERT INTO public.products (name, name_bn, brand, unit, category_id, description)
-SELECT v.name, v.name_bn, v.brand, v.unit, c.id, v.description
+INSERT INTO public.products (name, name_bn, brand, unit, category_id, description, image_url)
+SELECT v.name, v.name_bn, v.brand, v.unit, c.id, v.description, v.image_url
 FROM (VALUES
-  ('Miniket Rice',      'মিনিকেট চাল',       'ACI',       'kg',    'Rice',          'Premium polished miniket rice'),
-  ('Nazirshail Rice',   'নাজিরশাইল চাল',     'Pran',      'kg',    'Rice',          'Aromatic nazirshail rice'),
-  ('Chinigura Rice',    'চিনিগুঁড়া চাল',     'Teer',      'kg',    'Rice',          'Fragrant polao rice'),
-  ('Soybean Oil 1L',    'সয়াবিন তেল ১ লিটার','Fresh',     'litre', 'Edible Oil',    'Fortified soybean oil, 1 litre bottle'),
-  ('Soybean Oil 5L',    'সয়াবিন তেল ৫ লিটার','Rupchanda', 'litre', 'Edible Oil',    'Fortified soybean oil, 5 litre can'),
-  ('Mustard Oil 1L',    'সরিষার তেল',        'Radhuni',   'litre', 'Edible Oil',    'Cold pressed mustard oil'),
-  ('Masoor Dal',        'মসুর ডাল',          'Teer',      'kg',    'Lentils',       'Red lentils'),
-  ('Chola Dal',         'ছোলা ডাল',          'Pran',      'kg',    'Lentils',       'Split chickpea lentils'),
-  ('Sugar',             'চিনি',              'Fresh',     'kg',    'Sugar & Flour', 'Refined white sugar'),
-  ('Atta',              'আটা',               'Teer',      'kg',    'Sugar & Flour', 'Whole wheat flour'),
-  ('Onion',             'পেঁয়াজ',            NULL,        'kg',    'Vegetables',    'Local onion'),
-  ('Potato',            'আলু',               NULL,        'kg',    'Vegetables',    'Local potato'),
-  ('Farm Eggs (dozen)', 'ফার্মের ডিম',       NULL,        'dozen', 'Eggs & Dairy',  'Brown farm eggs, 12 pieces'),
-  ('Rui Fish',          'রুই মাছ',           NULL,        'kg',    'Fish',          'Fresh rui, medium size')
-) AS v(name, name_bn, brand, unit, category, description)
+  ('Miniket Rice',      'মিনিকেট চাল',       'ACI',       'kg',    'Rice',          'Premium polished miniket rice', 'https://placehold.co/600x600/e8d9b5/3f3f46/png?text=Miniket+Rice'),
+  ('Nazirshail Rice',   'নাজিরশাইল চাল',     'Pran',      'kg',    'Rice',          'Aromatic nazirshail rice', 'https://placehold.co/600x600/e0cfa8/3f3f46/png?text=Nazirshail+Rice'),
+  ('Chinigura Rice',    'চিনিগুঁড়া চাল',     'Teer',      'kg',    'Rice',          'Fragrant polao rice', 'https://placehold.co/600x600/efe3c7/3f3f46/png?text=Chinigura+Rice'),
+  ('Soybean Oil 1L',    'সয়াবিন তেল ১ লিটার','Fresh',     'litre', 'Edible Oil',    'Fortified soybean oil, 1 litre bottle', 'https://placehold.co/600x600/f2d675/3f3f46/png?text=Soybean+Oil+1L'),
+  ('Soybean Oil 5L',    'সয়াবিন তেল ৫ লিটার','Rupchanda', 'litre', 'Edible Oil',    'Fortified soybean oil, 5 litre can', 'https://placehold.co/600x600/e8c95a/3f3f46/png?text=Soybean+Oil+5L'),
+  ('Mustard Oil 1L',    'সরিষার তেল',        'Radhuni',   'litre', 'Edible Oil',    'Cold pressed mustard oil', 'https://placehold.co/600x600/d9a441/3f3f46/png?text=Mustard+Oil+1L'),
+  ('Masoor Dal',        'মসুর ডাল',          'Teer',      'kg',    'Lentils',       'Red lentils', 'https://placehold.co/600x600/e2a06a/3f3f46/png?text=Masoor+Dal'),
+  ('Chola Dal',         'ছোলা ডাল',          'Pran',      'kg',    'Lentils',       'Split chickpea lentils', 'https://placehold.co/600x600/d8b271/3f3f46/png?text=Chola+Dal'),
+  ('Sugar',             'চিনি',              'Fresh',     'kg',    'Sugar & Flour', 'Refined white sugar', 'https://placehold.co/600x600/f5f2ea/3f3f46/png?text=Sugar'),
+  ('Atta',              'আটা',               'Teer',      'kg',    'Sugar & Flour', 'Whole wheat flour', 'https://placehold.co/600x600/e6d7bd/3f3f46/png?text=Atta'),
+  ('Onion',             'পেঁয়াজ',            NULL,        'kg',    'Vegetables',    'Local onion', 'https://placehold.co/600x600/c98c9a/3f3f46/png?text=Onion'),
+  ('Potato',            'আলু',               NULL,        'kg',    'Vegetables',    'Local potato', 'https://placehold.co/600x600/d9c3a0/3f3f46/png?text=Potato'),
+  ('Farm Eggs (dozen)', 'ফার্মের ডিম',       NULL,        'dozen', 'Eggs & Dairy',  'Brown farm eggs, 12 pieces', 'https://placehold.co/600x600/f0e2c8/3f3f46/png?text=Farm+Eggs'),
+  ('Rui Fish',          'রুই মাছ',           NULL,        'kg',    'Fish',          'Fresh rui, medium size', 'https://placehold.co/600x600/bcd3d9/3f3f46/png?text=Rui+Fish')
+) AS v(name, name_bn, brand, unit, category, description, image_url)
 JOIN public.categories c ON c.name = v.category
 WHERE NOT EXISTS (SELECT 1 FROM public.products p WHERE p.name = v.name);
 
@@ -1000,5 +1089,5 @@ WHERE p.name IN ('Miniket Rice', 'Onion')
 
 
 -- ==========================================================================
--- DONE. Open the app - you should see 14 products across 7 sellers.
+-- DONE. Open the app - 14 products across 7 sellers, with images.
 -- ==========================================================================

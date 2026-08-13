@@ -78,7 +78,39 @@ check("sellers not duplicated", "COUNT(*) FROM sellers", 7)
 check("prices not duplicated", "COUNT(*) FROM prices", 43)
 check("search still correct", "COUNT(*) FROM search_products('চাল')", 3)
 
-print("\n[5] Security")
+
+print("\n[6] Migration 003 — favourites RPC")
+check("get_favorite_products exists",
+      "COUNT(*) FROM pg_proc WHERE proname='get_favorite_products'", 1)
+# auth.uid() is NULL here (no signed-in user), so it must return nothing rather
+# than leaking every favourite in the table.
+check("returns nothing without a signed-in user",
+      "COUNT(*) FROM get_favorite_products(100,0)", 0)
+
+print("\n[7] Product images are seeded")
+check("all products have an image", "COUNT(*) FROM products WHERE image_url IS NULL", 0)
+check("images are https", "COUNT(*) FROM products WHERE image_url NOT LIKE 'https://%'", 0)
+
+print("\n[8] Pagination contract the app relies on")
+check("page 1 of 5", "COUNT(*) FROM search_products('',NULL,NULL,NULL,NULL,'name',5,0)", 5)
+check("page 2 of 5", "COUNT(*) FROM search_products('',NULL,NULL,NULL,NULL,'name',5,5)", 5)
+check("page 3 partial", "COUNT(*) FROM search_products('',NULL,NULL,NULL,NULL,'name',5,10)", 4)
+check("past the end is empty", "COUNT(*) FROM search_products('',NULL,NULL,NULL,NULL,'name',5,20)", 0)
+check("total_count is the FULL count, not the page",
+      "total_count FROM search_products('',NULL,NULL,NULL,NULL,'name',5,0) LIMIT 1", 14)
+check("pages do not overlap",
+      "COUNT(DISTINCT id) FROM ("
+      "SELECT id FROM search_products('',NULL,NULL,NULL,NULL,'name',5,0) UNION ALL "
+      "SELECT id FROM search_products('',NULL,NULL,NULL,NULL,'name',5,5) UNION ALL "
+      "SELECT id FROM search_products('',NULL,NULL,NULL,NULL,'name',5,10)) q", 14)
+
+print("\n[9] Category filter (powers the new filter chip)")
+check("filter by Rice category",
+      "COUNT(*) FROM search_products('', (SELECT id FROM categories WHERE name='Rice'))", 3)
+check("filter by Vegetables",
+      "COUNT(*) FROM search_products('', (SELECT id FROM categories WHERE name='Vegetables'))", 2)
+
+print("\n[10] Security")
 check("public read", "COUNT(*) FROM pg_policies WHERE tablename='products' AND policyname='products_public_read'", 1)
 check("admin-only writes", "COUNT(*) FROM pg_policies WHERE tablename='prices' AND policyname='prices_admin_write'", 1)
 check("no authenticated-write hole", "COUNT(*) FROM pg_policies WHERE qual LIKE '%auth.role() = ''authenticated''%'", 0)
