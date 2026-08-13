@@ -51,8 +51,12 @@ build/
 # Docker
 .dockerignore
 
-# Supabase
-supabase/
+# Supabase CLI
+# migrations/ and seed.sql MUST be tracked - they are the schema source of truth.
+# Only local state and secrets are ignored.
+supabase/.branches/
+supabase/.temp/
+supabase/.env
 .supabase/
 
 # Temporary files

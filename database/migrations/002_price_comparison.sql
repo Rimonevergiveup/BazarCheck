@@ -271,8 +271,12 @@ CREATE TRIGGER set_timestamp_prices BEFORE UPDATE ON public.prices
 -- and the app keeps working immediately. Re-assign them to real sellers as
 -- you add real data. products.price is LEFT IN PLACE (deprecated, not dropped).
 
+-- Only created when there is actually something to backfill. On a fresh
+-- project this inserts nothing, so you don't start with a phantom seller that
+-- owns no prices.
 INSERT INTO public.sellers (name, name_bn, slug, seller_type, location, city)
-VALUES ('Porokh Listing', 'পরখ তালিকা', 'porokh-listing', 'retail', 'Unassigned', 'Dhaka')
+SELECT 'Porokh Listing', 'পরখ তালিকা', 'porokh-listing', 'retail', 'Unassigned', 'Dhaka'
+WHERE EXISTS (SELECT 1 FROM public.products WHERE price IS NOT NULL AND price >= 0)
 ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO public.prices (product_id, seller_id, price, currency, source, collected_at)
