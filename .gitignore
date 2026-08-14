@@ -2,12 +2,12 @@
 node_modules/
 
 # Flutter
-porokh_app/.dart_tool/
-porokh_app/.packages
-porokh_app/.pub-cache/
-porokh_app/.pub/
-porokh_app/build/
-porokh_app/packages/
+bazarcheck_app/.dart_tool/
+bazarcheck_app/.packages
+bazarcheck_app/.pub-cache/
+bazarcheck_app/.pub/
+bazarcheck_app/build/
+bazarcheck_app/packages/
 
 # Python
 ai_service/__pycache__/
@@ -68,10 +68,10 @@ supabase/.env
 Thumbs.db
 
 # Flutter build artifacts
-porokh_app/android/app/build/
-porokh_app/ios/Pods/
-porokh_app/macos/Flutter/ephemeral/
-porokh_app/windows/flutter/ephemeral/
+bazarcheck_app/android/app/build/
+bazarcheck_app/ios/Pods/
+bazarcheck_app/macos/Flutter/ephemeral/
+bazarcheck_app/windows/flutter/ephemeral/
 
 # Python build artifacts
 ai_service/__pycache__/
@@ -80,6 +80,6 @@ ai_service/*.pyo
 ai_service/*.pyd
 
 # Generated files
-porokh_app/lib/*.g.dart
-porokh_app/lib/*.freezed.dart
-porokh_app/lib/*.gr.dart
+bazarcheck_app/lib/*.g.dart
+bazarcheck_app/lib/*.freezed.dart
+bazarcheck_app/lib/*.gr.dart
