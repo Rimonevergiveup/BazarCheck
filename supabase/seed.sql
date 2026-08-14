@@ -1,5 +1,5 @@
 -- ============================================================================
--- Porokh — seed data
+-- BazarCheck — seed data
 -- ============================================================================
 -- ILLUSTRATIVE SAMPLE DATA. These are plausible Bangladeshi retail figures used
 -- to exercise the UI; they are NOT live market prices and must not be presented

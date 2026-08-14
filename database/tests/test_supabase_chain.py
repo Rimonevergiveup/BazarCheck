@@ -13,7 +13,7 @@ import sys
 import psycopg
 
 REPO = pathlib.Path(__file__).resolve().parents[2]
-PGDATA = pathlib.Path("/tmp/porokh_chain")
+PGDATA = pathlib.Path("/tmp/bazarcheck_chain")
 if PGDATA.exists():
     shutil.rmtree(PGDATA, ignore_errors=True)
 PGDATA.mkdir(parents=True, exist_ok=True)

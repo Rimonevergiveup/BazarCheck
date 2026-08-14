@@ -1,11 +1,11 @@
-# Porokh · পরখ
+# BazarCheck · বাজারচেক
 
 Compare product prices across sellers in Bangladesh. Search in **Bangla or
 English**, see what every shop charges, and know **when each price was last
 checked**.
 
 ```
-USER OPENS POROKH  →  SEARCHES ("চাল" or "rice")  →  SEES EVERY SELLER'S PRICE
+USER OPENS BAZARCHECK  →  SEARCHES ("চাল" or "rice")  →  SEES EVERY SELLER'S PRICE
                      →  CHEAPEST IS BADGED  →  KNOWS HOW FRESH EACH PRICE IS
 ```
 
@@ -30,8 +30,8 @@ screen, and the same logic serves the app and the Python service.
 ## Layout
 
 ```
-porokh/
-├── porokh_app/                Flutter app
+bazarcheck/
+├── bazarcheck_app/                Flutter app
 │   ├── lib/
 │   │   ├── core/formatters.dart     ৳ BDT, Bangla digits, freshness
 │   │   ├── l10n/app_strings.dart    Bangla + English
@@ -54,7 +54,7 @@ porokh/
 │
 ├── supabase_schema.sql          original schema (migration 001)
 ├── HOW_TO_RUN.md                start here
-├── POROKH_AUDIT.md            audit of the pre-rebuild codebase
+├── BAZARDAM_AUDIT.md            audit of the pre-rebuild codebase
 └── docs/archive/                superseded planning docs
 ```
 
@@ -67,7 +67,7 @@ porokh/
 3. Run it:
 
 ```
-cd porokh_app
+cd bazarcheck_app
 flutter pub get
 flutter run
 ```
@@ -118,7 +118,7 @@ npm test                # all three
 Or directly — one command per line, since Windows PowerShell 5.1 rejects `&&`:
 
 ```
-cd porokh_app
+cd bazarcheck_app
 flutter test
 ```
 

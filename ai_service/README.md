@@ -1,6 +1,6 @@
-# Porokh AI Service
+# BazarCheck AI Service
 
-AI service for product recommendations and analysis in the Porokh application.
+AI service for product recommendations and analysis in the BazarCheck application.
 
 ## Features
 - Product analysis and insights
@@ -34,10 +34,10 @@ python main.py
 ### Using Docker
 ```bash
 # Build the Docker image
-docker build -t porokh-ai-service .
+docker build -t bazarcheck-ai-service .
 
 # Run the container
-docker run -p 8000:8000 porokh-ai-service
+docker run -p 8000:8000 bazarcheck-ai-service
 ```
 
 ## API Endpoints

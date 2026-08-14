@@ -3,7 +3,7 @@ services:
     build:
       context: ./ai_service
       dockerfile: Dockerfile
-    image: porokh/price-service:2.0.0
+    image: bazarcheck/price-service:2.0.0
     ports:
       - "8000:8000"
     env_file:

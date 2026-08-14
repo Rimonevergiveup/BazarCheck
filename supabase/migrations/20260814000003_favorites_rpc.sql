@@ -1,5 +1,5 @@
 -- ============================================================================
--- Porokh — Migration 003: favourites RPC
+-- BazarCheck — Migration 003: favourites RPC
 -- ============================================================================
 -- Fixes a real scaling bug. The app previously loaded favourites by fetching
 -- the first 100 products and filtering client-side, so a favourite ranked 101st

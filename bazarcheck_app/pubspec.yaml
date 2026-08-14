@@ -1,0 +1,49 @@
+name: bazarcheck_app
+description: "BazarCheck — track essential commodity prices across Bangladesh."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Bangla + English UI. Ships with the SDK, so no version conflicts.
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Backend: Postgres + auth. All price comparison happens in RPC functions.
+  supabase_flutter: ^2.6.0
+
+  # State management
+  riverpod: ^2.4.12
+  flutter_riverpod: ^2.4.12
+
+  # Talks to the Python price-insights service (optional at runtime)
+  http: ^1.2.2
+
+  # Disk-cached product images. Replaces bare Image.network, which
+  # re-downloaded on every rebuild and scroll.
+  cached_network_image: ^3.3.0
+
+  # Persists the user's language and theme choice between launches
+  shared_preferences: ^2.2.0
+
+  # Opens a seller's product page from the comparison table
+  url_launcher: ^6.2.0
+
+  # Removed: path_provider and image_picker were declared but referenced in
+  # zero files.
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

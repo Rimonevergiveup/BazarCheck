@@ -1,21 +1,21 @@
 {
-  "name": "porokh",
+  "name": "bazarcheck",
   "version": "1.0.0",
   "private": true,
-  "description": "Porokh — compare product prices across sellers in Bangladesh. Flutter + Supabase + Python price service.",
+  "description": "BazarCheck — compare product prices across sellers in Bangladesh. Flutter + Supabase + Python price service.",
   "scripts": {
-    "setup": "cd porokh_app && flutter pub get && cd ../ai_service && pip install -r requirements.txt",
-    "app": "cd porokh_app && flutter run",
-    "app:build": "cd porokh_app && flutter build apk --release",
+    "setup": "cd bazarcheck_app && flutter pub get && cd ../ai_service && pip install -r requirements.txt",
+    "app": "cd bazarcheck_app && flutter run",
+    "app:build": "cd bazarcheck_app && flutter build apk --release",
     "service": "cd ai_service && python main.py",
     "service:build": "docker compose build",
     "test": "npm run test:app && npm run test:service && npm run test:db",
-    "test:app": "cd porokh_app && flutter analyze --fatal-warnings && flutter test",
+    "test:app": "cd bazarcheck_app && flutter analyze --fatal-warnings && flutter test",
     "test:service": "cd ai_service && pytest -v",
     "test:db": "python database/tests/test_migration.py"
   },
   "keywords": [
-    "porokh",
+    "bazarcheck",
     "price-comparison",
     "bangladesh",
     "flutter",

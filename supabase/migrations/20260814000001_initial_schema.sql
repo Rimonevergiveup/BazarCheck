@@ -1,5 +1,5 @@
 -- ============================================================================
--- Porokh — Migration 001: base catalogue
+-- BazarCheck — Migration 001: base catalogue
 -- ============================================================================
 -- divisions ▸ categories ▸ products, plus ai_results.
 --

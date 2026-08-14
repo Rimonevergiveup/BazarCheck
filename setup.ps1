@@ -1,5 +1,5 @@
 <#
-  Porokh — one-command setup for Windows PowerShell.
+  BazarCheck — one-command setup for Windows PowerShell.
 
   Usage, from the repo root:
 
@@ -19,7 +19,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = $PSScriptRoot
-$app  = Join-Path $repo "porokh_app"
+$app  = Join-Path $repo "bazarcheck_app"
 
 function Say($msg, $colour = "Cyan") { Write-Host "`n=== $msg ===" -ForegroundColor $colour }
 function Ok($msg)   { Write-Host "  [ok]   $msg" -ForegroundColor Green }
@@ -102,11 +102,11 @@ Write-Host @"
 # ---------------------------------------------------------------------------
 if ($NoRun) {
     Say "Done" "Green"
-    Write-Host "  Launch later with:  cd porokh_app ; flutter run -d $Device" -ForegroundColor DarkGray
+    Write-Host "  Launch later with:  cd bazarcheck_app ; flutter run -d $Device" -ForegroundColor DarkGray
     exit 0
 }
 
-Say "Launching Porokh on $Device" "Green"
+Say "Launching BazarCheck on $Device" "Green"
 Write-Host "  r = hot reload   R = hot restart   q = quit`n" -ForegroundColor DarkGray
 Push-Location $app
 try { flutter run -d $Device }

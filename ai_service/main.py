@@ -1,4 +1,4 @@
-"""Porokh Price Service.
+"""BazarCheck Price Service.
 
 Statistical analysis over the REAL price data in Supabase.
 
@@ -58,7 +58,7 @@ logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
-log = logging.getLogger("porokh.price_service")
+log = logging.getLogger("bazarcheck.price_service")
 
 
 # ---------------------------------------------------------------------------
@@ -137,7 +137,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(
-    title="Porokh Price Service",
+    title="BazarCheck Price Service",
     description="Statistical price analysis over real Supabase data",
     version="2.0.0",
     lifespan=lifespan,
@@ -332,7 +332,7 @@ def analyse_offers(product_id: str, offers: List[Dict[str, Any]],
 @app.get("/")
 async def root() -> Dict[str, Any]:
     return {
-        "service": "Porokh Price Service",
+        "service": "BazarCheck Price Service",
         "version": "2.0.0",
         "supabase_configured": supabase.configured,
     }
