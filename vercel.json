@@ -1,0 +1,11 @@
+{
+  "buildCommand": "bash build.sh",
+  "outputDirectory": "bazarcheck_app/build/web",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
