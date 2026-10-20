@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/formatters.dart';
@@ -110,7 +111,7 @@ class _TrendsScreenState extends ConsumerState<TrendsScreen> {
                     ],
                   ),
                 ),
-              ),
+              ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOutBack),
 
               const SizedBox(height: 16),
 
@@ -162,11 +163,11 @@ class _TrendsScreenState extends ConsumerState<TrendsScreen> {
                       ],
                     ),
                   ),
-                ),
+                ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOutBack),
               ),
 
               const SizedBox(height: 16),
-              _StatsGrid(item: selected, bangla: bangla),
+              _StatsGrid(item: selected, bangla: bangla).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOutBack),
 
               const SizedBox(height: 16),
               // Replaces the mockup's "AI PREDICTION" panel with the reason it
@@ -202,7 +203,7 @@ class _TrendsScreenState extends ConsumerState<TrendsScreen> {
                     ),
                   ],
                 ),
-              ),
+              ).animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOutBack),
             ],
           );
         },
@@ -269,7 +270,6 @@ class _StatCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(10),
         border: Border(
           left: BorderSide(color: accent, width: 3),
           top: BorderSide(color: theme.colorScheme.outlineVariant),

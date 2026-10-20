@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../models/product_summary.dart';
 import 'app_image.dart';
@@ -31,7 +32,7 @@ class ProductCard extends StatelessWidget {
     final theme = Theme.of(context);
     final name = product.displayName(bangla: bangla);
 
-    return Card(
+    final card = Card(
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -121,6 +122,8 @@ class ProductCard extends StatelessWidget {
         ),
       ),
     );
+
+    return card.animate().fadeIn(duration: 300.ms).slideY(begin: 0.1, end: 0, duration: 300.ms, curve: Curves.easeOutQuad);
   }
 }
 
@@ -181,7 +184,7 @@ class DealCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return SizedBox(
+    final widget = SizedBox(
       width: 168,
       child: Card(
         child: InkWell(
@@ -229,5 +232,7 @@ class DealCard extends StatelessWidget {
         ),
       ),
     );
+
+    return widget.animate().fadeIn(duration: 300.ms, delay: 50.ms).slideX(begin: 0.1, end: 0, duration: 300.ms, curve: Curves.easeOutQuad);
   }
 }

@@ -105,6 +105,7 @@ class ErrorView extends StatelessWidget {
   final String? message;
   final VoidCallback? onRetry;
   final IconData icon;
+  final bool showDebugDetails;
 
   const ErrorView({
     super.key,
@@ -112,6 +113,7 @@ class ErrorView extends StatelessWidget {
     this.message,
     this.onRetry,
     this.icon = Icons.error_outline,
+    this.showDebugDetails = false,
   });
 
   @override
@@ -158,13 +160,11 @@ class ErrorView extends StatelessWidget {
               ),
             ],
 
-            // Developer detail, debug builds only.
+            // Developer detail, only when explicitly requested.
             //
-            // End users must never see a raw PostgrestException, but hiding it
-            // from YOU during development makes every failure look identical
-            // and impossible to diagnose. kDebugMode is compiled out of release
-            // builds entirely, so this cannot ship.
-            if (kDebugMode && error != null) ...[
+            // End users must never see a raw PostgrestException or internal stack,
+            // so this is opt-in and off by default.
+            if (showDebugDetails && kDebugMode && error != null) ...[
               const SizedBox(height: 24),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 560),

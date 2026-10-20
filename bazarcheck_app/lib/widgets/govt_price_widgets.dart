@@ -98,33 +98,35 @@ class GovtVsLocalPrices extends StatelessWidget {
     final theme = Theme.of(context);
     final unitSuffix = (unit == null || unit!.isEmpty) ? '' : '/$unit';
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: _PriceBlock(
-            caption: t.govtFixed,
-            value: Fmt.price(govtPrice, bangla: bangla),
-            suffix: unitSuffix,
-            valueColour: AppTheme.primary,
-            background: theme.colorScheme.govtTint,
-            emptyLabel: t.noOfficialRate,
-            compact: compact,
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _PriceBlock(
+              caption: t.govtFixed,
+              value: Fmt.price(govtPrice, bangla: bangla),
+              suffix: unitSuffix,
+              valueColour: AppTheme.primary,
+              background: theme.colorScheme.govtTint,
+              emptyLabel: t.noOfficialRate,
+              compact: compact,
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _PriceBlock(
-            caption: t.localMarket,
-            value: Fmt.price(localPrice, bangla: bangla),
-            suffix: unitSuffix,
-            valueColour: theme.colorScheme.onSurface,
-            background: theme.colorScheme.surfaceContainerLow,
-            emptyLabel: t.noPrice,
-            compact: compact,
+          const SizedBox(width: 8),
+          Expanded(
+            child: _PriceBlock(
+              caption: t.localMarket,
+              value: Fmt.price(localPrice, bangla: bangla),
+              suffix: unitSuffix,
+              valueColour: theme.colorScheme.onSurface,
+              background: theme.colorScheme.surfaceContainerLow,
+              emptyLabel: t.noPrice,
+              compact: compact,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

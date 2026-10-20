@@ -82,6 +82,34 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
 
+              // --- Search bar -----------------------------------------------
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                  child: GestureDetector(
+                    onTap: () {
+                      ref.read(selectedTabProvider.notifier).state = 1;
+                      ref.read(searchAutofocusProvider.notifier).state = true;
+                    },
+                    child: AbsorbPointer(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: t.searchHint,
+                          prefixIcon: const Icon(Icons.search),
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 0, horizontal: 16),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
               // --- Sample-data disclosure ----------------------------------
               // Government rates here are illustrative. Saying so once, plainly,
               // at the top is the difference between a demo and a lie.
@@ -101,7 +129,7 @@ class HomeScreen extends ConsumerWidget {
                   title: t.dailyEssentials,
                   action: t.viewAll,
                   onAction: () =>
-                      ref.read(selectedTabProvider.notifier).state = 1,
+                      ref.read(selectedTabProvider.notifier).state = 2,
                 ),
               ),
 
@@ -126,8 +154,8 @@ class HomeScreen extends ConsumerWidget {
                         child: EmptyView(
                           icon: Icons.inventory_2_outlined,
                           message: t.nothingHere,
-                          hint: 'Apply database/COMPLETE_SETUP.sql, '
-                              'then pull to refresh.',
+                          hint: 'Run database/COMPLETE_SETUP.sql in '
+                              'Supabase SQL Editor, then pull to refresh.',
                         ),
                       ),
                     );
@@ -138,16 +166,23 @@ class HomeScreen extends ConsumerWidget {
                     sliver: SliverList.separated(
                       itemCount: top.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 10),
-                      itemBuilder: (context, i) => EssentialCard(
-                        item: top[i],
-                        bangla: bangla,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                ProductDetailScreen(productId: top[i].id),
-                          ),
-                        ),
-                      ),
+                      itemBuilder: (context, i) {
+                        try {
+                          return EssentialCard(
+                            item: top[i],
+                            bangla: bangla,
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    ProductDetailScreen(productId: top[i].id),
+                              ),
+                            ),
+                          );
+                        } catch (e, stack) {
+                          debugPrint('SLIVERLIST ITEM ERROR: $e\n$stack');
+                          return Text('Error: $e');
+                        }
+                      },
                     ),
                   );
                 },
@@ -284,7 +319,7 @@ class _MarketPulse extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       '${up ? '+' : ''}'
-                      '${Fmt.percent(e.gapPercent!, bangla: bangla)}',
+                      '${Fmt.percent(e.gapPercent ?? 0.0, bangla: bangla)}',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: colour,
                         fontWeight: FontWeight.w700,

@@ -200,7 +200,10 @@ class SettingsScreen extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => ref.read(authServiceProvider).signOut(),
+                onPressed: () async {
+                  ref.read(guestModeProvider.notifier).state = false;
+                  await ref.read(authServiceProvider).signOut();
+                },
                 icon: const Icon(Icons.logout),
                 label: Text(t.signOut),
                 style: OutlinedButton.styleFrom(

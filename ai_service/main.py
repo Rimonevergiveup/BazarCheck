@@ -25,6 +25,8 @@ import logging
 import os
 import statistics
 import time
+import numpy as np
+from sklearn.linear_model import LinearRegression
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
@@ -33,7 +35,16 @@ from typing import Any, Deque, Dict, List, Optional
 import httpx
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+import sys
 from pydantic import BaseModel, Field
+
+# Load .env when running server (skip under pytest so mock tests pass)
+if "PYTEST_CURRENT_TEST" not in os.environ and "pytest" not in sys.modules:
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
 
 # ---------------------------------------------------------------------------
 # Configuration - everything from the environment, nothing hardcoded
@@ -295,21 +306,33 @@ def analyse_offers(product_id: str, offers: List[Dict[str, Any]],
     if len(recent) >= 3:
         recent.sort(key=lambda pair: pair[0])
         values = [v for _, v in recent]
-        midpoint = len(values) // 2
-        earlier = statistics.fmean(values[:midpoint]) if midpoint else values[0]
-        later = statistics.fmean(values[midpoint:])
-
-        if earlier > 0:
-            change = (later - earlier) / earlier * 100
+        
+        # ML Trend Prediction using Linear Regression
+        # X is days since the first data point in the window
+        t0 = recent[0][0]
+        X = np.array([(ts - t0).total_seconds() / 86400 for ts, _ in recent]).reshape(-1, 1)
+        y = np.array(values)
+        
+        model = LinearRegression()
+        model.fit(X, y)
+        
+        # Predict price 7 days from the last point
+        last_day = X[-1][0]
+        predicted_price = model.predict([[last_day + 7]])[0]
+        current_price = values[-1]
+        
+        if current_price > 0:
+            change = (predicted_price - current_price) / current_price * 100
             insight.trend_percent = round(change, 1)
             if change <= -3:
                 insight.trend = "falling"
-                notes.append(f"Prices are down about {abs(change):.0f}% recently.")
+                notes.append(f"ML forecast: Prices expected to drop by {abs(change):.0f}% next week.")
             elif change >= 3:
                 insight.trend = "rising"
-                notes.append(f"Prices are up about {change:.0f}% recently.")
+                notes.append(f"ML forecast: Prices expected to rise by {change:.0f}% next week.")
             else:
                 insight.trend = "stable"
+                notes.append("ML forecast: Prices expected to remain stable next week.")
 
         recorded_low = min(values)
         if recorded_low > 0 and insight.cheapest <= recorded_low * 1.02:

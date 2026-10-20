@@ -56,10 +56,10 @@ class AppTheme {
   static const drop   = Color(0xFF006E2C); // price falling — good
   static const stable = Color(0xFF414754);
 
-  static ThemeData light() => _build(Brightness.light);
-  static ThemeData dark()  => _build(Brightness.dark);
+  static ThemeData light({bool isBangla = false}) => _build(Brightness.light, isBangla);
+  static ThemeData dark({bool isBangla = false})  => _build(Brightness.dark, isBangla);
 
-  static ThemeData _build(Brightness brightness) {
+  static ThemeData _build(Brightness brightness, bool isBangla) {
     final isLight = brightness == Brightness.light;
 
     final scheme = isLight
@@ -102,32 +102,31 @@ class AppTheme {
             brightness: Brightness.dark,
           );
 
-    // Inter throughout, per the export. Falls back to the platform default if
-    // Inter is not installed, which still renders Bangla correctly.
-    const font = 'Inter';
+    // Inter for English, Hind Siliguri for Bangla.
+    final String fontFamily = isBangla ? 'Hind Siliguri' : 'Inter';
 
     final text = TextTheme(
       // headline-lg / md / sm from DESIGN.md
-      headlineLarge: _t(24, FontWeight.w700, 32, scheme.onSurface),
-      headlineMedium: _t(20, FontWeight.w700, 28, scheme.onSurface),
-      headlineSmall: _t(18, FontWeight.w600, 24, scheme.onSurface),
-      titleLarge: _t(18, FontWeight.w700, 24, scheme.onSurface),
-      titleMedium: _t(16, FontWeight.w600, 22, scheme.onSurface),
-      titleSmall: _t(14, FontWeight.w600, 20, scheme.onSurface),
+      headlineLarge: _t(24, FontWeight.w700, 32, scheme.onSurface, isBangla),
+      headlineMedium: _t(20, FontWeight.w700, 28, scheme.onSurface, isBangla),
+      headlineSmall: _t(18, FontWeight.w600, 24, scheme.onSurface, isBangla),
+      titleLarge: _t(18, FontWeight.w700, 24, scheme.onSurface, isBangla),
+      titleMedium: _t(16, FontWeight.w600, 22, scheme.onSurface, isBangla),
+      titleSmall: _t(14, FontWeight.w600, 20, scheme.onSurface, isBangla),
       // body-lg / md
-      bodyLarge: _t(16, FontWeight.w400, 24, scheme.onSurface),
-      bodyMedium: _t(14, FontWeight.w400, 20, scheme.onSurface),
-      bodySmall: _t(12, FontWeight.w400, 16, scheme.onSurfaceVariant),
-      labelLarge: _t(14, FontWeight.w600, 20, scheme.onSurface),
-      labelMedium: _t(12, FontWeight.w600, 16, scheme.onSurfaceVariant),
+      bodyLarge: _t(16, FontWeight.w400, 24, scheme.onSurface, isBangla),
+      bodyMedium: _t(14, FontWeight.w400, 20, scheme.onSurface, isBangla),
+      bodySmall: _t(12, FontWeight.w400, 16, scheme.onSurfaceVariant, isBangla),
+      labelLarge: _t(14, FontWeight.w600, 20, scheme.onSurface, isBangla),
+      labelMedium: _t(12, FontWeight.w600, 16, scheme.onSurfaceVariant, isBangla),
       // The tiny uppercase captions used for GOVT FIXED / LOCAL MARKET
-      labelSmall: _t(11, FontWeight.w600, 14, scheme.onSurfaceVariant),
+      labelSmall: _t(11, FontWeight.w600, 14, scheme.onSurfaceVariant, isBangla),
     );
 
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      fontFamily: font,
+      fontFamily: fontFamily,
       textTheme: text,
       scaffoldBackgroundColor: isLight ? surface : scheme.surface,
 
@@ -137,7 +136,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        titleTextStyle: _t(20, FontWeight.w700, 28, primary),
+        titleTextStyle: _t(20, FontWeight.w700, 28, isLight ? primary : const Color(0xFF90CAF9), isBangla),
       ),
 
       cardTheme: CardThemeData(
@@ -159,7 +158,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isLight ? surfaceContainerLow : scheme.surfaceContainerHigh,
-        hintStyle: _t(16, FontWeight.w400, 24, scheme.onSurfaceVariant),
+        hintStyle: _t(16, FontWeight.w400, 24, scheme.onSurfaceVariant, isBangla),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -171,7 +170,10 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: primary, width: 2),
+          borderSide: BorderSide(
+            color: isLight ? primary : const Color(0xFF90CAF9),
+            width: 2,
+          ),
         ),
       ),
 
@@ -181,7 +183,7 @@ class AppTheme {
           foregroundColor: onPrimaryContainer,
           minimumSize: const Size(64, 48),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: _t(16, FontWeight.w600, 24, onPrimaryContainer),
+          textStyle: _t(16, FontWeight.w600, 24, onPrimaryContainer, isBangla),
         ),
       ),
 
@@ -195,9 +197,15 @@ class AppTheme {
 
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: primary,
+          foregroundColor: isLight ? primary : const Color(0xFF90CAF9),
           minimumSize: const Size(48, 44),
-          textStyle: _t(14, FontWeight.w600, 20, primary),
+          textStyle: _t(
+            14,
+            FontWeight.w600,
+            20,
+            isLight ? primary : const Color(0xFF90CAF9),
+            isBangla,
+          ),
         ),
       ),
 
@@ -205,34 +213,45 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         side: BorderSide(color: scheme.outlineVariant),
         backgroundColor: isLight ? surfaceContainerLowest : scheme.surfaceContainerHigh,
-        labelStyle: _t(14, FontWeight.w600, 20, scheme.onSurface),
+        labelStyle: _t(14, FontWeight.w600, 20, scheme.onSurface, isBangla),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       ),
 
-      // The 5-tab bar: HOME · COMPARE · MAP · TRENDS · SETTINGS
+      // Navigation bar with high-contrast, crystal-clear labels and icons in both modes
       navigationBarTheme: NavigationBarThemeData(
         height: 68,
         elevation: 0,
-        backgroundColor: isLight ? surfaceContainerLowest : scheme.surface,
-        indicatorColor: primaryFixed,
+        backgroundColor: isLight ? surfaceContainerLowest : const Color(0xFF131720),
+        indicatorColor: isLight ? primaryFixed : const Color(0xFF1D3B68),
         indicatorShape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         labelTextStyle: WidgetStateProperty.resolveWith(
-          (states) => _t(
-            10,
-            FontWeight.w600,
-            14,
-            states.contains(WidgetState.selected) ? primary : onSurfaceVariant,
-          ).copyWith(letterSpacing: 0.4),
+          (states) {
+            final isSelected = states.contains(WidgetState.selected);
+            final textColor = isLight
+                ? (isSelected ? primary : const Color(0xFF475569))
+                : (isSelected ? const Color(0xFF90CAF9) : const Color(0xFFCBD5E1));
+            return _t(
+              11,
+              isSelected ? FontWeight.w700 : FontWeight.w600,
+              14,
+              textColor,
+              isBangla,
+            ).copyWith(letterSpacing: 0.3);
+          },
         ),
         iconTheme: WidgetStateProperty.resolveWith(
-          (states) => IconThemeData(
-            size: 22,
-            color: states.contains(WidgetState.selected)
-                ? primary
-                : onSurfaceVariant,
-          ),
+          (states) {
+            final isSelected = states.contains(WidgetState.selected);
+            final iconColor = isLight
+                ? (isSelected ? primary : const Color(0xFF475569))
+                : (isSelected ? const Color(0xFF90CAF9) : const Color(0xFFCBD5E1));
+            return IconThemeData(
+              size: 23,
+              color: iconColor,
+            );
+          },
         ),
       ),
 
@@ -255,14 +274,17 @@ class AppTheme {
     );
   }
 
-  static TextStyle _t(double size, FontWeight weight, double height, Color c) =>
-      TextStyle(
-        fontFamily: 'Inter',
-        fontSize: size,
-        fontWeight: weight,
-        height: height / size,
-        color: c,
-      );
+  static TextStyle _t(double size, FontWeight weight, double height, Color c, bool isBangla) {
+    final base = TextStyle(
+      fontSize: size,
+      fontWeight: weight,
+      height: height / size,
+      color: c,
+    );
+    return base.copyWith(
+      fontFamily: isBangla ? 'Hind Siliguri' : 'Inter',
+    );
+  }
 }
 
 /// Semantic price colours, resolved per brightness so they stay legible in

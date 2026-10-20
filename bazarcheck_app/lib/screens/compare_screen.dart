@@ -8,7 +8,6 @@ import '../theme/app_theme.dart';
 import '../widgets/govt_price_widgets.dart';
 import '../widgets/status_views.dart';
 import 'product_detail_screen.dart';
-import 'search_screen.dart';
 
 /// Compare — every rate-controlled staple, official price against the market.
 ///
@@ -65,9 +64,10 @@ class _CompareScreenState extends ConsumerState<CompareScreen> {
           IconButton(
             tooltip: t.searchProducts,
             icon: const Icon(Icons.manage_search),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SearchScreen()),
-            ),
+            onPressed: () {
+              ref.read(selectedTabProvider.notifier).state = 1;
+              ref.read(searchAutofocusProvider.notifier).state = true;
+            },
           ),
         ],
       ),

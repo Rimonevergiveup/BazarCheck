@@ -36,7 +36,7 @@ Ok "flutter  $((flutter --version 2>&1 | Select-Object -First 1))"
 
 $hasPython = [bool](Get-Command python -ErrorAction SilentlyContinue)
 if ($hasPython) { Ok "python   $((python --version 2>&1))" }
-else            { Warn "python not found — the optional price service will be skipped" }
+else            { Warn "python not found - the optional price service will be skipped" }
 
 # ---------------------------------------------------------------------------
 Say "Flutter dependencies"
@@ -85,10 +85,10 @@ if ($hasPython) {
 
 # ---------------------------------------------------------------------------
 Say "Database reminder" "Yellow"
-Write-Host @"
+Write-Host "
   The app needs its schema before it will show anything.
 
-  1. Open  https://supabase.com/dashboard/project/dekloejbpkqyxccdarvh/sql/new
+  1. Open  https://supabase.com/dashboard/project/fhctcrasoesugarhxuco/sql/new
   2. Paste ALL of  database\COMPLETE_SETUP.sql
   3. Run it
 
@@ -96,8 +96,8 @@ Write-Host @"
 
      UPDATE public.profiles SET role='admin' WHERE email='YOUR@EMAIL.COM';
 
-  Without step 2 the app runs fine but every list shows "Nothing here yet".
-"@ -ForegroundColor Yellow
+  Without step 2 the app runs fine but every list shows ""Nothing here yet"".
+" -ForegroundColor Yellow
 
 # ---------------------------------------------------------------------------
 if ($NoRun) {

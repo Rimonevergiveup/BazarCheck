@@ -23,12 +23,12 @@ class AppConfig {
   // Prefer --dart-define in CI so the committed default is only a dev fallback.
   static const String supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'https://dekloejbpkqyxccdarvh.supabase.co',
+    defaultValue: 'https://fhctcrasoesugarhxuco.supabase.co',
   );
 
   static const String supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue: 'sb_publishable_OjBm2eSKa0i3mkV6_9XPOg_nxubaa-x',
+    defaultValue: 'sb_publishable_l1u45FBnFM5q2p9LxAmovg_QUFMkNms',
   );
 
   // ---------------------------------------------------------------------------

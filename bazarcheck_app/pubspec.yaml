@@ -36,6 +36,8 @@ dependencies:
 
   # Opens a seller's product page from the comparison table
   url_launcher: ^6.2.0
+  google_fonts: ^8.2.1
+  flutter_animate: ^4.5.2
 
   # Removed: path_provider and image_picker were declared but referenced in
   # zero files.

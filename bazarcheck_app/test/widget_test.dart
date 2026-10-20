@@ -7,6 +7,7 @@ import 'package:bazarcheck_app/widgets/status_views.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Wraps a widget in the minimum app scaffolding its lookups need.
 Widget wrap(Widget child, {Locale locale = const Locale('en')}) {
@@ -45,6 +46,10 @@ ProductSummary product({
 }
 
 void main() {
+  setUpAll(() {
+    GoogleFonts.config.allowRuntimeFetching = false;
+  });
+
   group('PriceDisplay', () {
     testWidgets('shows "Price unavailable" instead of ৳0 when there is no price',
         (tester) async {
@@ -111,6 +116,7 @@ void main() {
         bangla: false,
         onTap: () {},
       )));
+      await tester.pumpAndSettle();
 
       expect(find.text('Miniket Rice'), findsOneWidget);
       expect(find.text('৳72'), findsOneWidget);
@@ -128,6 +134,7 @@ void main() {
         ),
         locale: const Locale('bn'),
       ));
+      await tester.pumpAndSettle();
 
       expect(find.text('মিনিকেট চাল'), findsOneWidget);
     });
@@ -142,6 +149,7 @@ void main() {
         ),
         locale: const Locale('bn'),
       ));
+      await tester.pumpAndSettle();
 
       expect(find.text('Miniket Rice'), findsOneWidget);
     });
@@ -153,6 +161,7 @@ void main() {
         bangla: false,
         onTap: () {},
       )));
+      await tester.pumpAndSettle();
 
       expect(find.textContaining('Save'), findsNothing);
       expect(find.text('1 seller'), findsOneWidget);
@@ -165,8 +174,9 @@ void main() {
         bangla: false,
         onTap: () => tapped = true,
       )));
+      await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(ProductCard));
+      await tester.tap(find.byType(ProductCard), warnIfMissed: false);
       expect(tapped, isTrue);
     });
 
@@ -177,6 +187,7 @@ void main() {
         onTap: () {},
         // onToggleFavorite omitted => anonymous user
       )));
+      await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.favorite_border), findsNothing);
     });
@@ -188,6 +199,7 @@ void main() {
         onTap: () {},
         onToggleFavorite: () {},
       )));
+      await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.favorite_border), findsOneWidget);
     });

@@ -64,6 +64,9 @@ final currentUserProvider = Provider<User?>((ref) {
 
 final isSignedInProvider = Provider<bool>((ref) => ref.watch(currentUserProvider) != null);
 
+/// Tracks whether an unauthenticated user has elected to browse as a guest.
+final guestModeProvider = StateProvider<bool>((ref) => false);
+
 // ---------------------------------------------------------------------------
 // Settings: language + theme, persisted across launches
 // ---------------------------------------------------------------------------
@@ -471,12 +474,75 @@ final favoritesProvider =
   );
 });
 
-final favoriteProductsProvider = FutureProvider<List<ProductSummary>>((ref) {
+class FavoritesPaginationNotifier extends StateNotifier<PagedResults> {
+  static const int pageSize = 20;
+
+  final CatalogRepository _repo;
+  final bool _signedIn;
+  bool _busy = false;
+
+  FavoritesPaginationNotifier(this._repo, this._signedIn) : super(const PagedResults()) {
+    _loadFirstPage();
+  }
+
+  Future<void> _loadFirstPage() async {
+    if (!_signedIn) {
+      state = const PagedResults(isLoadingFirstPage: false);
+      return;
+    }
+    _busy = true;
+    try {
+      final items = await _repo.getFavorites(limit: pageSize, offset: 0);
+      if (!mounted) return;
+      final totalCount = items.isEmpty ? 0 : items.first.totalCount;
+      state = PagedResults(
+        items: items,
+        totalCount: totalCount,
+        isLoadingFirstPage: false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      state = PagedResults(isLoadingFirstPage: false, error: e);
+    } finally {
+      _busy = false;
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (!_signedIn || _busy || !state.hasMore || state.isLoadingFirstPage) return;
+    _busy = true;
+    state = state.copyWith(isLoadingMore: true);
+    try {
+      final items = await _repo.getFavorites(
+        limit: pageSize,
+        offset: state.items.length,
+      );
+      if (!mounted) return;
+      final totalCount = items.isEmpty ? state.totalCount : items.first.totalCount;
+      state = state.copyWith(
+        items: [...state.items, ...items],
+        totalCount: totalCount,
+        isLoadingMore: false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      state = state.copyWith(isLoadingMore: false, error: e);
+    } finally {
+      _busy = false;
+    }
+  }
+
+  Future<void> refresh() async {
+    state = const PagedResults();
+    await _loadFirstPage();
+  }
+}
+
+final favoritePaginationProvider = StateNotifierProvider<FavoritesPaginationNotifier, PagedResults>((ref) {
   final user = ref.watch(currentUserProvider);
-  if (user == null) return Future.value(const []);
-  // Re-run whenever the set of favourites changes.
-  ref.watch(favoritesProvider);
-  // Server-side and scoped to auth.uid(); no client-side filtering, so this
-  // stays correct however large the catalogue grows.
-  return ref.watch(catalogRepositoryProvider).getFavorites();
+  if (user != null) {
+    // Re-run whenever the set of favourites changes
+    ref.watch(favoritesProvider);
+  }
+  return FavoritesPaginationNotifier(ref.watch(catalogRepositoryProvider), user != null);
 });

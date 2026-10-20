@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Bilingual strings for BazarCheck (English + Bangla).
@@ -65,6 +66,7 @@ class AppStrings {
 
   // --- Tabs -----------------------------------------------------------------
   String get tabHome     => _s('HOME', 'হোম');
+  String get tabSearch   => _s('SEARCH', 'খোঁজুন');
   String get tabCompare  => _s('COMPARE', 'তুলনা');
   String get tabMap      => _s('MAP', 'মানচিত্র');
   String get tabTrends   => _s('TRENDS', 'প্রবণতা');
@@ -294,7 +296,7 @@ class _AppStringsDelegate extends LocalizationsDelegate<AppStrings> {
       AppStrings.supportedLocales.any((l) => l.languageCode == locale.languageCode);
 
   @override
-  Future<AppStrings> load(Locale locale) async => AppStrings(locale);
+  Future<AppStrings> load(Locale locale) => SynchronousFuture<AppStrings>(AppStrings(locale));
 
   @override
   bool shouldReload(_AppStringsDelegate old) => false;

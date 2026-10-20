@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/app_strings.dart';
@@ -62,7 +63,7 @@ class MapScreen extends ConsumerWidget {
                 ),
               ],
             ),
-          ),
+          ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOutBack),
 
           const SizedBox(height: 24),
           Text(
@@ -124,7 +125,7 @@ class MapScreen extends ConsumerWidget {
                             .read(selectedRegionProvider.notifier)
                             .state = r.slug,
                       ),
-                    ),
+                    ).animate().fadeIn(duration: 300.ms, delay: 100.ms).slideX(begin: 0.1, end: 0, duration: 300.ms, curve: Curves.easeOutQuad),
                     const SizedBox(height: 8),
                   ],
                 ],
